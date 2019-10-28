@@ -1,0 +1,42 @@
+version: '2'
+networks:
+  frontend:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+services:
+  pyapp:
+    build: .
+    container_name: pyapp
+    command: python pythongetapi.py
+    ports:
+      - "5000:5000"
+    networks:
+      frontend:
+        ipv4_address: 172.20.0.4
+    volumes:
+      - .:/app
+    links:
+      - mongodb
+      - spree
+
+  spree:
+    container_name: spree
+    image: spreecommerce/spree
+    restart: always
+    ports:
+      - "3001:3001"
+    networks:
+      frontend:
+        ipv4_address: 172.20.0.2
+
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      frontend:
+        ipv4_address: 172.20.0.3
